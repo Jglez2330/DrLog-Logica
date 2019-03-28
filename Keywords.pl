@@ -2,6 +2,11 @@ readText(Palabra):- read(X),
   atomic_list_concat(List,' ',X),
   searchKeyword(Palabra,List).
 
+readText(Palabra,X):-
+  atomic_list_concat(List,' ',X),
+
+    searchKeyword(Palabra,List).
+
 keyword(Word):- enfermedad(Word).
 keyword(Word):- causa(Word).
 
