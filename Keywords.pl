@@ -1,6 +1,6 @@
-readText(Palabra):- read(X),
+readText():- read(X),
   atomic_list_concat(List,' ',X),
-  searchKeyword(Palabra,List).
+  searchKeywords(List).
 
 readText(Palabra,X):-
   atomic_list_concat(List,' ',X),
@@ -13,5 +13,7 @@ keyword(Word):- causa(Word).
 enfermedad(cancer).
 causa(existir).
 
-searchKeyword(X,[X|_]):- keyword(X).
-searchKeyword(X,[_|Y]):- searchKeyword(X,Y).
+searchKeywords([]).
+searchKeywords([X|Z]):- keyword(X); searchKeywords(Z).
+
+
