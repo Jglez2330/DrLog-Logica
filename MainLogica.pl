@@ -1,3 +1,6 @@
+:-consult('DataBase').
+
+
 consultaMedica():- %se inicializan las variables de sintomas y enfermedad del paciente en 0.
     b_setval(sint1,0),
     b_setval(sint2,0),
@@ -11,8 +14,7 @@ conversacion():-read(X),
   conversacion(). %recursividad para hacer un ciclo de conversacion
 
 revisar(List):- searchExtra(List). %keywords sin necesidad de revisar sintaxis
-revisar(List):- %oracion(List,[]), %keywords que importa la sintaxis
-  %write("ORACION"), nl,
+revisar(List):- oracion(List,[]), %keywords que importa la sintaxis
   searchKeywords(List).
 revisar(_):- write("Lo siento, no entendí, por favor repítalo."), nl.
 % -------------------------------------------------------------------------
@@ -24,25 +26,25 @@ asignarVar(Sintoma):- b_getval(sint3,S3), S3 == 0, b_setval(sint3, Sintoma).
 suficientesSintomas():-b_getval(sint1,S1),b_getval(sint2,S2),b_getval(sint3,S3),
     sintomas_de(S1,S2,S3,E), b_setval(enfer,E),
     write("Lamento decirle esto, pero usted padece de "),write(E),nl.
-suficientesSintomas():- write("Necesito que me diga más sintomas"),nl.
+suficientesSintomas().
 
 % revisa las keywords y da una respuesta dependiendo del tipo de keyword
-keyword(Word):- sintoma(Word), %el paciente está dando mencionando un sintoma
-     asignarVar(Word), suficientesSintomas().
+keyword(Word,Resto):- sintoma(Word),%el paciente está dando mencionando un sintoma
+     asignarVar(Word), suficientesSintomas(),searchKeywords(Resto).
 
-keyword(Word):- caus(Word), %pregunta por las causas de su enfermedad
+keyword(Word,_):- caus(Word), %pregunta por las causas de su enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> causa_enfermedad(E,C), write(C), nl;
+    (   E \= 0 -> causa_enfermedad(E,C),write("La causa comun de esa enfermedad es "), write(C), nl;
         write("Como quiere que le de la causa de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
-keyword(Word):- trat(Word), %pregunta por el tratamiento de su enfermedad
+keyword(Word,_):- trat(Word), %pregunta por el tratamiento de su enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> curar_enfermedad(E,T), write(T), nl;
+    (   E \= 0 -> curar_enfermedad(E,T),write("Usted debe "), write(T), nl;
         write("Como quiere que le diga como curar de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
-keyword(Word):- prev(Word), %pregunta como prevenir la enfermedad
+keyword(Word,_):- prev(Word), %pregunta como prevenir la enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> lista_prevenciones(E,L), write(L), nl;
+    (   E \= 0 -> lista_prevenciones(E),write("Para prevenir esa enfermedad, se recomienda ");
         write("Como quiere que le diga como prevenir de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
 keywordExtra(Word):- saludo(Word), write("Hola, en que lo puedo ayudar hoy?"), nl.
@@ -50,10 +52,10 @@ keywordExtra(Word):- despedida(Word), write("Adios, espero que esté bien."), nl,
     break.
 
 %busqueda en la lista de palabras
-searchKeywords([]):- false.
-searchKeywords([X|Z]):- searchKeywords(Z); keyword(X).
+searchKeywords([]).
+searchKeywords([X|Z]):- keyword(X,Z); searchKeywords(Z).
 
-searchExtra([]):- false.
+searchExtra([]):-false.
 searchExtra([X|Z]):- keywordExtra(X); searchExtra(Z).
 % ------------------------------------------------------------------------------
 % BNF
@@ -81,129 +83,6 @@ determinante([la|A],A).
 
 
 % ------------------------------------------------------------------------
-%Lista de enfermedades, las enfermedades se tratan como strings
-
-enfermedad("Gripe").
-enfermedad("Virus Estomacal").
-enfermedad("Cancer").
-enfermedad("Bronquitis").
-enfermedad("Varicela").
-
-% Lista de sintomas, de momento los sintomas son tratados como atomos de
-% prolog, sin embargo hay algunos que pueden quedar ambigüos como dolor
-% (puede ser dolor de cuerpo, dolor de estómago,etc), igual sucede con
-% pérdida (pérdida de apetito, pérdida de peso).Se puede cambiar a
-% string para solucionar la ambigüedad pero se debe recibir el string
-% completo de la comunicación con el usuario
-
-sintoma(tos).
-sintoma(fiebre).
-sintoma(cansancio).
-sintoma(diarrea).
-sintoma(vomito).
-sintoma(dolor).
-sintoma(perdida).
-sintoma(flema).
-sintoma(picazon).
-sintoma(ampollas).
-
-
-% Lista de Causas para cada enfermedad, El primer string del hecho es la
-% causa (la cuál es propia y única para cada enfermedad), el segundo
-% string indica a cuál enfermedad pertenece dicha causa.
-
-
-causa("La gripe es causada por el virus de la influenza","Gripe").
-causa("El virus que causa la varicela es el virus varicela zóster","Varicela").
-causa("El virus estomacal es causado por el norovirus y el rotavirus ","Virus Estomacal").
-causa("Los mismos virus que causan los resfriados y la gripe son la causa más frecuente de la bronquitis","Bronquitis").
-causa("Por lo general el cancer lo provocan mutaciones geneticas","Cancer").
-
-
-%Lista de prevenciones
-
-prevencion("Lavarse las manos").
-prevencion("Cubrise la boca al toser").
-prevencion("Usar desinfectante para manos").
-prevencion("Desinfectar superficies y objetos del hogar").
-prevencion("Hacer ejercicio con frecuencia").
-prevencion("Tener buena alimentación").
-prevencion("Evitar los vicios como alcohol o cigarros").
-
-
-% Hechos que me asocian una prevención, con el área del cuerpo a la
-% cuál va dirigida la prevención
-
-prevencion_area("Lavarse las manos",estomago).
-prevencion_area("Lavarse las manos",respiracion).
-prevencion_area("Cubrise la boca al toser",respiracion).
-prevencion_area("Usar desinfectante para manos",estomago).
-prevencion_area("Desinfectar superficies y objetos del hogar",estomago).
-prevencion_area("Hacer ejercicio con frecuencia",condicion_fisica).
-prevencion_area("Tener buena alimentación",peso).
-prevencion_area("Evitar los vicios como alcohol o cigarros",condicion_fisica).
-
-
-% Hechos que me indican si una enfermedad tiene tratamiento previo, para
-% incluirlos también en la lista de prevenciones de cada enfermedad. El
-% primer string es el nombre de la enfermedad y el segundo el
-% tratamiento.
-
-tratamiento_previo("Gripe","Vacunarse todos los años").
-tratamiento_previo("Bronquitis","Ponerse la vacuna para la gripe todos los años").
-tratamiento_previo("Varicela","Vacunarse contra el virus que produce la varicela").
-
-
-% Lista de tratamientos posteriores a la enfermedad, el hecho los asocia
-% directamente con la enfermedad (segundo parámetro) ya que los
-% tratamientos son únicos para cada tipo de enfermedad de la base de
-% datos
-
-
-tratamiento_enfermedad("Tomar antigripal por una semana y tomar líquidos en abundancia","Gripe").
-tratamiento_enfermedad("Ingerir alimentos blandos y mantenerse hidratado","Virus Estomacal").
-tratamiento_enfermedad("Consumir medicamentos para la tos y comprar un inhibidor para los pulmones","Bronquitis").
-tratamiento_enfermedad("Cubrir las ampollas para la piel y utilizar cremas para reducir la picazón","Varicela").
-tratamiento_enfermedad("Someterse a una quimioterapia","Cancer").
-
-
-
-% Hechos que me indican las áreas de afectación de cada enfermedad, una
-% misma enfermedad puede atacar diferentes áreas del cuerpo
-
-enfermedad_area("Gripe",respiracion).
-enfermedad_area("Gripe",cuerpo).
-enfermedad_area("Gripe",temperatura).
-enfermedad_area("Virus Estomacal",estomago).
-enfermedad_area("Virus Estomacal",temperatura).
-enfermedad_area("Cancer",cuerpo).
-enfermedad_area("Cancer",peso).
-enfermedad_area("Cancer",temperatura).
-enfermedad_area("Cancer",condicion_fisica).
-enfermedad_area("Bronquitis",respiracion).
-enfermedad_area("Bronquitis",cuerpo).
-enfermedad_area("Bronquitis",pecho).
-enfermedad_area("Varicela",piel).
-enfermedad_area("Varicela",temperatura).
-
-
-% Áreas de afectación de cada síntoma, en principio un sintoma solo
-% puede atacar un área específica del cuerpo, sin embargo hay algunos
-% sintomas que atacan varias áreas debido a la ambigüedad de los mismos
-% (son el caso de dolor y perdida).
-
-sintoma_area(tos,respiracion).
-sintoma_area(fiebre,temperatura).
-sintoma_area(cansancio,cuerpo).
-sintoma_area(diarrea,estomago).
-sintoma_area(vomito,estomago).
-sintoma_area(dolor,estomago).
-sintoma_area(dolor,cuerpo).
-sintoma_area(perdida,peso).
-sintoma_area(perdida,estomago).
-sintoma_area(flema,pecho).
-sintoma_area(picazon,piel).
-sintoma_area(ampollas,piel).
 
 
 % Reglas principales para relacionar los hechos de la base de datos y
@@ -242,7 +121,15 @@ causa_enfermedad(E,C):-enfermedad(E),causa(C,E).
 prevenir_enfermedad(E,P):-enfermedad(E),tratamiento_previo(E,P).
 prevenir_enfermedad(E,P):-enfermedad(E),prevencion(P),enfermedad_area(E,X),prevencion_area(P,X).
 
-lista_prevenciones(E,L):-findall(Prevencion,prevenir_enfermedad(E,Prevencion),L).
+lista_prevenciones(E):-findall(Prevencion,prevenir_enfermedad(E,Prevencion),L),
+    concatenarLista(L).
+
+concatenarLista(L):- concatenarLista(L," ",_).
+concatenarLista([],_,SF):-write(SF).
+concatenarLista([S1|Resto],SI,_):- string_concat(S1,", ",S),
+    string_concat(SI,S,SFinal),
+    concatenarLista(Resto,SFinal,SFinal).
+
 
 % Regla para relacionar el tratamiento con una enfermedad, se recibe
 % como parámetro la enfermedad y devuelve en la variable T, el
@@ -250,48 +137,8 @@ lista_prevenciones(E,L):-findall(Prevencion,prevenir_enfermedad(E,Prevencion),L)
 
 curar_enfermedad(E,T):-enfermedad(E),tratamiento_enfermedad(T,E).
 
-
-
-
-
-
 %base de datos
-nombre([hombre|A],A).
-nombre([manzana|A],A).
-nombre([cancer|A],A).
-nombre([yo|A],A).
-nombre([tengo|A],A).
-nombre([gripe|A],A).
 
-
-verbo([come|A],A).
-verbo([canta|A],A).
-verbo([tiene|A],A).
-
-
-saludo(hola).
-saludo(saludos).
-saludo(buenas).
-saludo(buenos).
-
-despedida(adios).
-despedida(luego).
-
-prev(prevenirla).
-prev(prevenirlo).
-prev(prevenir).
-prev(prevencion).
-
-trat(tratamiento).
-trat(tratarlo).
-trat(tratarla).
-trat(tratar).
-trat(curarme).
-trat(cura).
-trat(tomar).
-trat(medicina).
-
-caus(causa).
 
 
 
