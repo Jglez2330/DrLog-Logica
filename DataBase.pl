@@ -7,11 +7,11 @@ enfermedad("Bronquitis").
 enfermedad("Varicela").
 
 % Lista de sintomas, de momento los sintomas son tratados como atomos de
-% prolog, sin embargo hay algunos que pueden quedar ambigüos como dolor
-% (puede ser dolor de cuerpo, dolor de estómago,etc), igual sucede con
-% pérdida (pérdida de apetito, pérdida de peso).Se puede cambiar a
-% string para solucionar la ambigüedad pero se debe recibir el string
-% completo de la comunicación con el usuario
+% prolog, sin embargo hay algunos que pueden quedar ambigï¿½os como dolor
+% (puede ser dolor de cuerpo, dolor de estï¿½mago,etc), igual sucede con
+% pï¿½rdida (pï¿½rdida de apetito, pï¿½rdida de peso).Se puede cambiar a
+% string para solucionar la ambigï¿½edad pero se debe recibir el string
+% completo de la comunicaciï¿½n con el usuario
 
 sintoma(tos).
 sintoma(fiebre).
@@ -26,14 +26,14 @@ sintoma(ampollas).
 
 
 % Lista de Causas para cada enfermedad, El primer string del hecho es la
-% causa (la cuál es propia y única para cada enfermedad), el segundo
-% string indica a cuál enfermedad pertenece dicha causa.
+% causa (la cuï¿½l es propia y ï¿½nica para cada enfermedad), el segundo
+% string indica a cuï¿½l enfermedad pertenece dicha causa.
 
 
 causa("La gripe es causada por el virus de la influenza","Gripe").
-causa("El virus que causa la varicela es el virus varicela zóster","Varicela").
+causa("El virus que causa la varicela es el virus varicela zï¿½ster","Varicela").
 causa("El virus estomacal es causado por el norovirus y el rotavirus ","Virus Estomacal").
-causa("Los mismos virus que causan los resfriados y la gripe son la causa más frecuente de la bronquitis","Bronquitis").
+causa("Los mismos virus que causan los resfriados y la gripe son la causa mï¿½s frecuente de la bronquitis","Bronquitis").
 causa("Por lo general el cancer lo provocan mutaciones geneticas","Cancer").
 
 
@@ -44,12 +44,12 @@ prevencion("Cubrise la boca al toser").
 prevencion("Usar desinfectante para manos").
 prevencion("Desinfectar superficies y objetos del hogar").
 prevencion("Hacer ejercicio con frecuencia").
-prevencion("Tener buena alimentación").
+prevencion("Tener buena alimentaciï¿½n").
 prevencion("Evitar los vicios como alcohol o cigarros").
 
 
-% Hechos que me asocian una prevención, con el área del cuerpo a la
-% cuál va dirigida la prevención
+% Hechos que me asocian una prevenciï¿½n, con el ï¿½rea del cuerpo a la
+% cuï¿½l va dirigida la prevenciï¿½n
 
 prevencion_area("Lavarse las manos",estomago).
 prevencion_area("Lavarse las manos",respiracion).
@@ -57,36 +57,36 @@ prevencion_area("Cubrise la boca al toser",respiracion).
 prevencion_area("Usar desinfectante para manos",estomago).
 prevencion_area("Desinfectar superficies y objetos del hogar",estomago).
 prevencion_area("Hacer ejercicio con frecuencia",condicion_fisica).
-prevencion_area("Tener buena alimentación",peso).
+prevencion_area("Tener buena alimentaciï¿½n",peso).
 prevencion_area("Evitar los vicios como alcohol o cigarros",condicion_fisica).
 
 
 % Hechos que me indican si una enfermedad tiene tratamiento previo, para
-% incluirlos también en la lista de prevenciones de cada enfermedad. El
+% incluirlos tambiï¿½n en la lista de prevenciones de cada enfermedad. El
 % primer string es el nombre de la enfermedad y el segundo el
 % tratamiento.
 
-tratamiento_previo("Gripe","Vacunarse todos los años").
-tratamiento_previo("Bronquitis","Ponerse la vacuna para la gripe todos los años").
+tratamiento_previo("Gripe","Vacunarse todos los aï¿½os").
+tratamiento_previo("Bronquitis","Ponerse la vacuna para la gripe todos los aï¿½os").
 tratamiento_previo("Varicela","Vacunarse contra el virus que produce la varicela").
 
 
 % Lista de tratamientos posteriores a la enfermedad, el hecho los asocia
-% directamente con la enfermedad (segundo parámetro) ya que los
-% tratamientos son únicos para cada tipo de enfermedad de la base de
+% directamente con la enfermedad (segundo parï¿½metro) ya que los
+% tratamientos son ï¿½nicos para cada tipo de enfermedad de la base de
 % datos
 
 
-tratamiento_enfermedad("Tomar antigripal por una semana y tomar líquidos en abundancia","Gripe").
+tratamiento_enfermedad("Tomar antigripal por una semana y tomar lï¿½quidos en abundancia","Gripe").
 tratamiento_enfermedad("Ingerir alimentos blandos y mantenerse hidratado","Virus Estomacal").
 tratamiento_enfermedad("Consumir medicamentos para la tos y comprar un inhibidor para los pulmones","Bronquitis").
-tratamiento_enfermedad("Cubrir las ampollas para la piel y utilizar cremas para reducir la picazón","Varicela").
+tratamiento_enfermedad("Cubrir las ampollas para la piel y utilizar cremas para reducir la picazï¿½n","Varicela").
 tratamiento_enfermedad("Someterse a una quimioterapia","Cancer").
 
 
 
-% Hechos que me indican las áreas de afectación de cada enfermedad, una
-% misma enfermedad puede atacar diferentes áreas del cuerpo
+% Hechos que me indican las ï¿½reas de afectaciï¿½n de cada enfermedad, una
+% misma enfermedad puede atacar diferentes ï¿½reas del cuerpo
 
 enfermedad_area("Gripe",respiracion).
 enfermedad_area("Gripe",cuerpo).
@@ -104,9 +104,9 @@ enfermedad_area("Varicela",piel).
 enfermedad_area("Varicela",temperatura).
 
 
-% Áreas de afectación de cada síntoma, en principio un sintoma solo
-% puede atacar un área específica del cuerpo, sin embargo hay algunos
-% sintomas que atacan varias áreas debido a la ambigüedad de los mismos
+% ï¿½reas de afectaciï¿½n de cada sï¿½ntoma, en principio un sintoma solo
+% puede atacar un ï¿½rea especï¿½fica del cuerpo, sin embargo hay algunos
+% sintomas que atacan varias ï¿½reas debido a la ambigï¿½edad de los mismos
 % (son el caso de dolor y perdida).
 
 sintoma_area(tos,respiracion).
@@ -129,10 +129,17 @@ nombre([yo|A],A).
 nombre([tengo|A],A).
 nombre([gripe|A],A).
 
+nombre([tos|A],A).
+nombre([fiebre|A],A).
+nombre([cansancio|A],A).
+nombre([enfermedad|A],A).
+
+
 
 verbo([come|A],A).
 verbo([canta|A],A).
 verbo([tiene|A],A).
+verbo([tengo|A],A).
 
 % -----------------------------------------------------------------------------
 % Palabras clave de usuario
