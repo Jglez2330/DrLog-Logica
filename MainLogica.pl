@@ -1,6 +1,5 @@
 :-consult('DataBase').
 
-
 consultaMedica():- %se inicializan las variables de sintomas y enfermedad del paciente en 0.
     b_setval(sint1,0),
     b_setval(sint2,0),
@@ -14,7 +13,7 @@ conversacion():-read(X),
   conversacion(). %recursividad para hacer un ciclo de conversacion
 
 revisar(List):- searchExtra(List). %keywords sin necesidad de revisar sintaxis
-revisar(List):- oracion(List,[]), %keywords que importa la sintaxis
+revisar(List):- %oracion(List,[]), %keywords que importa la sintaxis
   searchKeywords(List).
 revisar(_):- write("Lo siento, no entendí, por favor repítalo."), nl.
 % -------------------------------------------------------------------------
@@ -34,7 +33,7 @@ keyword(Word,Resto):- sintoma(Word),%el paciente está dando mencionando un sinto
 
 keyword(Word,_):- caus(Word), %pregunta por las causas de su enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> causa_enfermedad(E,C),write("La causa comun de esa enfermedad es "), write(C), nl;
+    (   E \= 0 -> causa_enfermedad(E,C), write(C), nl;
         write("Como quiere que le de la causa de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
 keyword(Word,_):- trat(Word), %pregunta por el tratamiento de su enfermedad
@@ -44,7 +43,8 @@ keyword(Word,_):- trat(Word), %pregunta por el tratamiento de su enfermedad
 
 keyword(Word,_):- prev(Word), %pregunta como prevenir la enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> lista_prevenciones(E),write("Para prevenir esa enfermedad, se recomienda ");
+    (   E \= 0 -> write("Para prevenir esa enfermedad, se recomienda "),nl,
+        lista_prevenciones(E);
         write("Como quiere que le diga como prevenir de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
 keywordExtra(Word):- saludo(Word), write("Hola, en que lo puedo ayudar hoy?"), nl.
@@ -69,18 +69,6 @@ sintagma_nominal(A,B):- determinante(A,C),
 sintagma_verbal(A,B):- verbo(A,C),
                        sintagma_nominal(C,B).
 sintagma_verbal(A,B):- verbo(A,B).
-
-determinante([el|A],A).
-determinante([como|A],A).
-determinante([que|A],A).
-determinante([cual|A],A).
-determinante([en|A],A).
-determinante([esa|A],A).
-determinante([lo|A],A).
-determinante([cuando|A],A).
-determinante([con|A],A).
-determinante([la|A],A).
-
 
 % ------------------------------------------------------------------------
 
@@ -138,17 +126,5 @@ concatenarLista([S1|Resto],SI,_):- string_concat(S1,", ",S),
 curar_enfermedad(E,T):-enfermedad(E),tratamiento_enfermedad(T,E).
 
 %base de datos
-
-
-
-
-
-
-
-
-
-
-
-
 
 

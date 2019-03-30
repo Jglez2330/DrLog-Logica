@@ -5,6 +5,7 @@ enfermedad("Virus Estomacal").
 enfermedad("Cancer").
 enfermedad("Bronquitis").
 enfermedad("Varicela").
+enfermedad("thanos").
 
 % Lista de sintomas, de momento los sintomas son tratados como atomos de
 % prolog, sin embargo hay algunos que pueden quedar ambigüos como dolor
@@ -23,6 +24,9 @@ sintoma(perdida).
 sintoma(flema).
 sintoma(picazon).
 sintoma(ampollas).
+sintoma(muerte).
+sintoma(polvo).
+sintoma(inexistencia).
 
 
 % Lista de Causas para cada enfermedad, El primer string del hecho es la
@@ -35,6 +39,8 @@ causa("El virus que causa la varicela es el virus varicela zóster","Varicela").
 causa("El virus estomacal es causado por el norovirus y el rotavirus ","Virus Estomacal").
 causa("Los mismos virus que causan los resfriados y la gripe son la causa más frecuente de la bronquitis","Bronquitis").
 causa("Por lo general el cancer lo provocan mutaciones geneticas","Cancer").
+causa("gemas","thanos").
+
 
 
 %Lista de prevenciones
@@ -46,6 +52,9 @@ prevencion("Desinfectar superficies y objetos del hogar").
 prevencion("Hacer ejercicio con frecuencia").
 prevencion("Tener buena alimentación").
 prevencion("Evitar los vicios como alcohol o cigarros").
+prevencion("ninguna").
+prevencion("matar a thanos").
+prevencion("no existir").
 
 
 % Hechos que me asocian una prevención, con el área del cuerpo a la
@@ -59,7 +68,9 @@ prevencion_area("Desinfectar superficies y objetos del hogar",estomago).
 prevencion_area("Hacer ejercicio con frecuencia",condicion_fisica).
 prevencion_area("Tener buena alimentación",peso).
 prevencion_area("Evitar los vicios como alcohol o cigarros",condicion_fisica).
-
+prevencion_area("ninguna",muerte).
+prevencion_area("matar a thanos",polvo).
+prevencion_area("no existir",inexistencia).
 
 % Hechos que me indican si una enfermedad tiene tratamiento previo, para
 % incluirlos también en la lista de prevenciones de cada enfermedad. El
@@ -69,6 +80,7 @@ prevencion_area("Evitar los vicios como alcohol o cigarros",condicion_fisica).
 tratamiento_previo("Gripe","Vacunarse todos los años").
 tratamiento_previo("Bronquitis","Ponerse la vacuna para la gripe todos los años").
 tratamiento_previo("Varicela","Vacunarse contra el virus que produce la varicela").
+tratamiento_previo("thanos","matar a thanos").
 
 
 % Lista de tratamientos posteriores a la enfermedad, el hecho los asocia
@@ -82,6 +94,7 @@ tratamiento_enfermedad("Ingerir alimentos blandos y mantenerse hidratado","Virus
 tratamiento_enfermedad("Consumir medicamentos para la tos y comprar un inhibidor para los pulmones","Bronquitis").
 tratamiento_enfermedad("Cubrir las ampollas para la piel y utilizar cremas para reducir la picazón","Varicela").
 tratamiento_enfermedad("Someterse a una quimioterapia","Cancer").
+tratamiento_enfermedad("ninguno","thanos").
 
 
 
@@ -102,6 +115,9 @@ enfermedad_area("Bronquitis",cuerpo).
 enfermedad_area("Bronquitis",pecho).
 enfermedad_area("Varicela",piel).
 enfermedad_area("Varicela",temperatura).
+enfermedad_area("thanos",cabeza).
+enfermedad_area("thanos",torso).
+enfermedad_area("thanos",piernas).
 
 
 % Áreas de afectación de cada síntoma, en principio un sintoma solo
@@ -121,19 +137,60 @@ sintoma_area(perdida,estomago).
 sintoma_area(flema,pecho).
 sintoma_area(picazon,piel).
 sintoma_area(ampollas,piel).
+sintoma_area(muerte, cabeza).
+sintoma_area(polvo, torso).
+sintoma_area(inexistencia, piernas).
 
+% ------------------------------------------------------------------------
+% Palabras para el BNF
 nombre([hombre|A],A).
-nombre([manzana|A],A).
 nombre([cancer|A],A).
 nombre([yo|A],A).
-nombre([tengo|A],A).
-nombre([gripe|A],A).
+nombre([doctor|A],A).
+nombre([drlog|A],A).
+nombre([fiebre|A],A).
+nombre([cansancio|A],A).
+nombre([tos|A],A).
+nombre([diarrea|A],A).
+nombre([dolor|A],A).
+nombre([vomito|A],A).
+nombre([flema|A],A).
+nombre([perdida|A],A).
+nombre([ampollas|A],A).
+nombre([garganta|A],A).
+nombre([cabeza|A],A).
+nombre([espalda|A],A).
+nombre([estomago|A],A).
+nombre([virus|A],A).
+nombre([manos|A],A).
+nombre([ojos|A],A).
+nombre([nariz|A],A).
+nombre([bronquitis|A],A).
+nombre([varicela|A],A).
+nombre([enfermedad|A],A).
+nombre([tratamiento|A],A).
+nombre([prevencion|A],A).
+nombre([cura|A],A).
 
 
-verbo([come|A],A).
-verbo([canta|A],A).
 verbo([tiene|A],A).
+verbo([tengo|A],A).
+verbo([duele|A],A).
+verbo([curar|A],A).
+verbo([tratar|A],A).
+verbo([prevenir|A],A).
 
+
+determinante([el|A],A).
+determinante([como|A],A).
+determinante([que|A],A).
+determinante([cual|A],A).
+determinante([en|A],A).
+determinante([esa|A],A).
+determinante([lo|A],A).
+determinante([cuando|A],A).
+determinante([con|A],A).
+determinante([la|A],A).
 % -----------------------------------------------------------------------------
 % Palabras clave de usuario
 saludo(hola).
@@ -159,3 +216,7 @@ trat(tomar).
 trat(medicina).
 
 caus(causa).
+caus(provoca).
+
+
+
