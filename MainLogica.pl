@@ -12,7 +12,10 @@ consultaMedica(X,Y):-
     b_setval(sint2,0),
     b_setval(sint3,0),
     b_setval(enfer,0),
+    nb_setval(enfermedad, 0),
     conversacion(X,Y).
+
+
 
 conversacion(X,Salida):-atomic_list_concat(List," ",X),
     revisar(List,Salida).
@@ -27,16 +30,16 @@ conversacion():-read(X),
 
 
 revisar(List):- searchExtra(List). %keywords sin necesidad de revisar sintaxis
-revisar(List):- %keywords que importa la sintaxis
+revisar(List):- %oracion(List,[]), %keywords que importa la sintaxis
   searchKeywords(List).
 
 revisar(_):- write("Lo siento, no entendi, por favor repitalo.\n").
 
-revisar(List,Y):- searchExtra(List,Y). %keywords sin necesidad de revisar sintaxis
+revisar(List,Y):- searchExtra(List,Y),!. %keywords sin necesidad de revisar sintaxis
 revisar(List,Y):- searchKeywords(List,Y).
 %keywords que importa la sintaxis
 
-revisar(_,Y):- atom_concat('Lo siento, no entendi, por favor repitalo.\n','',Y).
+revisar(List,Y):- (not(oracion(List,[]))),atom_concat('Lo siento, no entendi, por favor repitalo.\n','',Y).
 
 
 % -------------------------------------------------------------------------
@@ -45,14 +48,15 @@ asignarVar(Sintoma):- b_getval(sint1,S1), S1 == 0, b_setval(sint1, Sintoma).
 asignarVar(Sintoma):- b_getval(sint2,S2), S2 == 0, b_setval(sint2, Sintoma).
 asignarVar(Sintoma):- b_getval(sint3,S3), S3 == 0, b_setval(sint3, Sintoma).
 
-suficientesSintomas().
 suficientesSintomas():-b_getval(sint1,S1),b_getval(sint2,S2),b_getval(sint3,S3),
-    sintomas_de(S1,S2,S3,E), b_setval(enfer,E),
+    sintomas_de(S1,S2,S3,E), b_setval(enfer,E),nb_setval(enfermedad, E),
+    
     write("Lamento decirle esto, pero usted padece de "),write(E),nl.
+suficientesSintomas().
 
-suficientesSintomas(Salida).
-suficientesSintomas(Salida):-b_getval(sint1,S1),b_getval(sint2,S2),b_getval(sint3,S3),
-    sintomas_de(S1,S2,S3,E), b_setval(enfer,E),atom_concat('Lamento decirle esto, pero usted padece de', E, Salida).
+suficientesSintomas(_):-b_getval(sint1,S1),b_getval(sint2,S2),b_getval(sint3,S3),
+sintomas_de(S1,S2,S3,E), b_setval(enfer,E),nb_setval(enfermedad, E).
+suficientesSintomas(_).
 
 % revisa las keywords y da una respuesta dependiendo del tipo de keyword
 keyword(Word,Resto):- sintoma(Word),%el paciente estï¿½ dando mencionando un sintoma
@@ -60,7 +64,7 @@ keyword(Word,Resto):- sintoma(Word),%el paciente estï¿½ dando mencionando un sin
 
 keyword(Word,_):- caus(Word), %pregunta por las causas de su enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> causa_enfermedad(E,C),write("La causa comun de esa enfermedad es "), write(C), nl;
+    (   E \= 0 -> causa_enfermedad(E,C), write(C), nl;
         write("Como quiere que le de la causa de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
 keyword(Word,_):- trat(Word), %pregunta por el tratamiento de su enfermedad
@@ -70,12 +74,13 @@ keyword(Word,_):- trat(Word), %pregunta por el tratamiento de su enfermedad
 
 keyword(Word,_):- prev(Word), %pregunta como prevenir la enfermedad
     b_getval(enfer,E),
-    (   E \= 0 -> lista_prevenciones(E),write("Para prevenir esa enfermedad, se recomienda ");
+    (   E \= 0 -> write("Para prevenir esa enfermedad, se recomienda "),nl,
+        lista_prevenciones(E);
         write("Como quiere que le diga como prevenir de su enfermedad si aun no me ha dicho los sintomas necesarios para darle un diagnostico?"), nl).
 
 %GUI
-keyword(Word,Resto,Salida):- sintoma(Word),%el paciente estï¿½ dando mencionando un sintoma
-    asignarVar(Word), suficientesSintomas(X),searchKeywords(Resto,X).
+keyword(Word,Resto,_):- sintoma(Word),%el paciente estï¿½ dando mencionando un sintoma
+asignarVar(Word), suficientesSintomas(_),searchKeywords(Resto).
 
 keyword(Word,_,Salida):- caus(Word), %pregunta por las causas de su enfermedad
    b_getval(enfer,E),
@@ -104,8 +109,9 @@ keywordExtra(Word,Salida):- despedida(Word), atom_concat('Adios, espero que estï
 searchKeywords([]).
 searchKeywords([X|Z]):- keyword(X,Z); searchKeywords(Z).
 
-searchKeywords([],_).
-searchKeywords([X|Z],Salida):- keyword(X,Z,Salida); searchKeywords(Z,Salida).
+searchKeywords([X|Z],Salida):- keyword(X,Z,Salida).
+searchKeywords([_|Z],Salida):-searchKeywords(Z,Salida).
+searchKeywords([],Salida):- Salida \= 0 ,nb_getval(enfermedad, Salida).
 
 searchExtra([]):-false.
 searchExtra([X|Z]):- keywordExtra(X); searchExtra(Z).
@@ -124,22 +130,6 @@ sintagma_nominal(A,B):- determinante(A,C),
 sintagma_verbal(A,B):- verbo(A,C),
                        sintagma_nominal(C,B).
 sintagma_verbal(A,B):- verbo(A,B).
-
-determinante(["el"|A],A).
-determinante(["como"|A],A).
-determinante([que|A],A).
-determinante([cual|A],A).
-determinante([en|A],A).
-determinante([esa|A],A).
-determinante([lo|A],A).
-determinante([cuando|A],A).
-determinante([con|A],A).
-determinante([la|A],A).
-determinante(["yo"|A],A).
-
-
-
-
 
 % ------------------------------------------------------------------------
 
@@ -197,17 +187,5 @@ concatenarLista([S1|Resto],SI,_):- string_concat(S1,", ",S),
 curar_enfermedad(E,T):-enfermedad(E),tratamiento_enfermedad(T,E).
 
 %base de datos
-
-
-
-
-
-
-
-
-
-
-
-
 
 
